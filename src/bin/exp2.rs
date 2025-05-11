@@ -1,6 +1,6 @@
 use nom::bytes::complete::tag;
-use nom::character::complete::{digit1, space0, space1};
 use nom::character::complete;
+use nom::character::complete::{space0, space1};
 use nom::multi::fold_many0;
 use nom::sequence::{separated_pair, terminated};
 use nom::IResult;
@@ -43,7 +43,7 @@ fn parse_number_list(input: &str) -> IResult<&str, Vec<u32>> {
 
 fn parse_line(input: &str) -> IResult<&str, Card> {
     let (input, _) = (tag("Card"),space1).parse(input)?;
-    let (input, number) = digit1.parse(input)?;
+    let (input, number) = complete::u32.parse(input)?;
     let (input, _) = (tag(":"), space1).parse(input)?;
     let (input, (first_no_list, second_number_list)) = separated_pair(
         parse_number_list,
@@ -54,7 +54,7 @@ fn parse_line(input: &str) -> IResult<&str, Card> {
     Ok((
         input,
         Card {
-            number: number.parse::<u32>().unwrap(),
+            number: number,
             first_number_set: first_no_list,
             second_number_set: second_number_list,
         },
